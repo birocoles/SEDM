@@ -2,20 +2,4 @@
 __pycache__
 .cache
 .coverage
-
-# Tex files
-*.synctex.gz
-*.fls
-*.bbl
-*.blg
-*.fff
-*.log
-*.lof
-*.aux
-*.pyc
-*.out
-*.lot
-*.toc
-*.ttt
-*~
-*-eps-converted-to.pdf
+htmlcov

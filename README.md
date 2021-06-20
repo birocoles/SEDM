@@ -5,5 +5,5 @@ a two sets of points.
 
 
 <p align="center">
-    <img src="sedm_scheme.png" width = "500">
+    <img src="sedm_scheme.png" width = "700">
 </p>

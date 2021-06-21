@@ -203,7 +203,7 @@ def avoid_sqrt_numba(P, S):
 
 def _check_input(P, S):
     '''
-    Verify if input validity.
+    Verify input validity.
 
     parameters
     ----------

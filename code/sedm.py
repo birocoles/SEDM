@@ -201,6 +201,53 @@ def avoid_sqrt_numba(P, S):
     return D
 
 
+def vectorized_dictionary(data_points, source_points, check_input=True):
+    """
+    Compute Squared Euclidean Distance Matrix (SEDM) between the data points
+    and the source points.
+
+    parameters
+    ----------
+    data_points: dictionary
+        Dictionary containing the x, y and z coordinates at the keys 'x', 'y' and 'z',
+        respectively. Each key is a numpy array 1d having the same number of elements.
+    source_points: dictionary
+        Dictionary containing the x, y and z coordinates at the keys 'x', 'y' and 'z',
+        respectively. Each key is a numpy array 1d having the same number of elements.
+    check_input : boolean
+        If True, verify if the input is valid. Default is True.
+
+    returns
+    -------
+    SEDM: numpy array 2d
+        N x M SEDM between data points and source points.
+    """
+
+    if check_input is True:
+        # check shape and ndim of points
+        _are_coordinates(data_points)
+        _are_coordinates(source_points)
+
+    # compute the SEDM by using scipy.spatial.distance.cdist
+    #SEDM = distance.cdist(data_points.T, source_points.T, "sqeuclidean")
+
+    # compute the SEDM using numpy
+    D1 = (
+        data_points['x']*data_points['x'] + data_points['y']*data_points['y'] + data_points['z']*data_points['z']
+        )
+    D2 = (
+        source_points['x']*source_points['x'] + source_points['y']*source_points['y'] + source_points['z']*source_points['z']
+        )
+    D3 = 2*(
+        np.outer(data_points['x'], source_points['x']) + np.outer(data_points['y'], source_points['y']) + np.outer(data_points['z'], source_points['z'])
+        )
+
+    # use broadcasting rules to add D1, D2 and D3
+    D = D1[:,np.newaxis] + D2[np.newaxis,:] - D3
+
+    return D
+
+
 def _check_input(P, S):
     '''
     Verify input validity.
@@ -226,3 +273,34 @@ def _check_input(P, S):
     assert Mp == Ms == 3, 'P and S must have 3 rows'
 
     return Mp, Np, Ms, Ns
+
+
+def _are_coordinates(coordinates):
+    """
+    Check if coordinates is a dictionary formed by 3 numpy arrays 1d.
+
+    parameters
+    ----------
+    coordinates : generic object 
+        Python object to be verified.
+
+    returns
+    -------
+    D : int
+        Total number of points.
+    """
+    if type(coordinates) != dict:
+        raise ValueError("coordinates must be a dictionary")
+    if list(coordinates.keys()) != ['x', 'y', 'z']:
+        raise ValueError("coordinates must have the following 3 keys: 'x', 'y', 'z'")
+    for key in coordinates.keys():
+        if type(coordinates[key]) != np.ndarray:
+            raise ValueError("all keys in coordinates must be numpy arrays")
+    for key in coordinates.keys():
+        if coordinates[key].ndim != 1:
+            raise ValueError("all keys in coordinates must be a numpy array 1d")
+    D = coordinates['x'].size
+    if (coordinates['y'].size != D) or (coordinates['z'].size != D):
+        raise ValueError("all keys in coordinates must have the same number of elements")
+    
+    return D

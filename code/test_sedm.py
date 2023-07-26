@@ -52,3 +52,30 @@ def test_comparison_functions():
 
     for f in functions:
         aae(f(P, S), scipy_result, decimal=10)
+
+
+def test_comparison_vectorized_dictionary_scipy():
+    'check if vectorized_dictionary produces the same result as scipy'
+    np.random.seed(13)
+    P = np.random.rand(3, 8)
+    S = np.random.rand(3,11)
+
+    P_dict = {
+        'x' : np.array(P[0]),
+        'y' : np.array(P[1]),
+        'z' : np.array(P[2])
+    }
+
+    S_dict = {
+        'x' : np.array(S[0]),
+        'y' : np.array(S[1]),
+        'z' : np.array(S[2])
+    }
+
+    # compute with sedm.vectorized_dictionary
+    computed = sedm.vectorized_dictionary(P_dict, S_dict)
+
+    # compute a reference output with scipy
+    scipy_result = spt.distance.cdist(P.T, S.T, 'sqeuclidean')
+
+    aae(computed, scipy_result, decimal=10)
